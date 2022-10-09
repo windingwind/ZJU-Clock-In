@@ -138,7 +138,7 @@ class DecodeError(Exception):
 
 
 def dingtalk_print(bot, text, at_mobiles = []):
-    bot.send_text("【ERROR】" + text, True, at_mobiles=at_mobiles)
+    bot.send_text("【自动打卡】" + text, at_mobiles=at_mobiles)
     print(text)
 
 
