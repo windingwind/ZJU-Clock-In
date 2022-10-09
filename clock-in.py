@@ -8,6 +8,7 @@ import re
 import datetime
 import time
 import sys
+from dingtalkchatbot.chatbot import DingtalkChatbot
 
 
 class DaKa(object):
@@ -136,51 +137,60 @@ class DecodeError(Exception):
     pass
 
 
-def main(username, password):
+def dingtalk_print(bot, text, at_mobiles = []):
+    bot.send_text("【ERROR】" + text, True, at_mobiles=at_mobiles)
+    print(text)
+
+
+def main(username, password, bot, at_mobiles):
     """Hit card process
 
     Arguments:
         username: (str) 浙大统一认证平台用户名（一般为学号）
         password: (str) 浙大统一认证平台密码
     """
-    print("\n[Time] %s" %
+    dingtalk_print(bot, "\n[Time] %s" %
           datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    print("🚌 打卡任务启动")
+    dingtalk_print(bot, f"🚌 打卡任务启动 for {username}")
 
     dk = DaKa(username, password)
 
-    print("登录到浙大统一身份认证平台...")
+    dingtalk_print(bot, "登录到浙大统一身份认证平台...")
     try:
         dk.login()
-        print("已登录到浙大统一身份认证平台")
+        dingtalk_print(bot, "已登录到浙大统一身份认证平台")
     except Exception as err:
-        print(str(err))
+        dingtalk_print(bot, str(err), at_mobiles)
         raise Exception
 
-    print('正在获取个人信息...')
+    dingtalk_print(bot, '正在获取个人信息...')
     try:
         dk.get_info()
-        print('已成功获取个人信息')
+        dingtalk_print(bot, '已成功获取个人信息')
     except Exception as err:
-        print('获取信息失败，请手动打卡，更多信息: ' + str(err))
+        dingtalk_print(bot, '获取信息失败，请手动打卡，更多信息: ' + str(err), at_mobiles)
         raise Exception
 
-    print('正在为您打卡打卡打卡')
+    dingtalk_print(bot, '正在为您打卡打卡打卡')
     try:
         res = dk.post()
         if str(res['e']) == '0':
-            print('已为您打卡成功！')
+            dingtalk_print(bot, '已为您打卡成功！')
         else:
-            print(res['m'])
+            print(res)
+            dingtalk_print(bot, res['m'])
     except Exception:
-        print('数据提交失败')
+        dingtalk_print(bot, '数据提交失败', at_mobiles)
         raise Exception
 
 
 if __name__ == "__main__":
     username = sys.argv[1]
     password = sys.argv[2]
+    webhook_key = sys.argv[3]
+    at_mobiles = sys.argv[4].split(',')
+    bot = DingtalkChatbot(webhook_key)
     try:
-        main(username, password)
+        main(username, password, bot, at_mobiles)
     except Exception:
         exit(1)
