@@ -23,5 +23,7 @@ jobs:
         env:
           ACCOUNT: ${{ secrets.ACCOUNT }}
           PASSWORD: ${{ secrets.PASSWORD }}
+          WEBHOOK_KEY: ${{ secrets.WEBHOOK_KEY }}
+          AT_MOBILES: ${{ secrets.AT_MOBILES }}
         run: |
-          python3 clock-in.py ${ACCOUNT} ${PASSWORD}
+          python3 clock-in.py ${ACCOUNT} ${PASSWORD} ${WEBHOOK_KEY} ${AT_MOBILES}
